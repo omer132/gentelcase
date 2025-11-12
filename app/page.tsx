@@ -611,29 +611,29 @@ export default function Home() {
 
               return (
                 <div key={message.id} className="bg-white rounded-xl shadow-md p-6">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
                       <p className="text-lg font-semibold text-gray-900 truncate">{message.title}</p>
-                      <p className="font-semibold text-gray-800">
-                        {message.username}
-                        {message.isAdmin && (
-                          <span className="ml-2 text-xs text-red-600">(Admin)</span>
-                        )}
-                      </p>
+                    <p className="font-semibold text-gray-800">
+                      {message.username}
+                      {message.isAdmin && (
+                        <span className="ml-2 text-xs text-red-600">(Admin)</span>
+                      )}
+                    </p>
                       <p className="text-sm text-gray-700">{formatTime(message.createdAt)}</p>
-                    </div>
-                    {(message.userId === user.id || user.isAdmin) && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleDelete(message.id)}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          Sil
-                        </button>
-                      </div>
-                    )}
                   </div>
-
+                  {(message.userId === user.id || user.isAdmin) && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleDelete(message.id)}
+                        className="text-red-600 hover:text-red-800 text-sm"
+                      >
+                        Sil
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
                   <p
                     className={`text-gray-800 ${
                       isExpanded ? 'whitespace-pre-wrap' : 'truncate'
@@ -645,22 +645,22 @@ export default function Home() {
                   </p>
 
                   {isTruncated && (
-                    <button
+                      <button
                       onClick={() =>
                         setExpandedMessageId((current) =>
                           current === message.id ? null : message.id
                         )
                       }
                       className="mt-2 text-sm text-blue-600 hover:text-blue-800"
-                    >
+                      >
                       {isExpanded ? 'Kapat' : 'Detayları Göster'}
-                    </button>
-                  )}
-
-                  {message.updatedAt && (
-                    <p className="text-xs text-gray-400 mt-2">Düzenlendi</p>
-                  )}
-                </div>
+                      </button>
+                )}
+                
+                {message.updatedAt && (
+                  <p className="text-xs text-gray-400 mt-2">Düzenlendi</p>
+                )}
+              </div>
               );
             })
           )}

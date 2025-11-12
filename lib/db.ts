@@ -18,6 +18,7 @@ interface Session {
 
 interface Message {
   id: number;
+  title: string;
   content: string;
   userId: number;
   createdAt: string;
@@ -176,9 +177,10 @@ export function getAllMessages() {
   });
 }
 
-export function createMessage(userId: number, content: string) {
+export function createMessage(userId: number, title: string, content: string) {
   const message: Message = {
     id: getNextMessageId(),
+    title,
     content,
     userId,
     createdAt: new Date().toISOString(),
@@ -193,9 +195,10 @@ export function getMessageById(id: number): Message | undefined {
   return db.messages.find((m) => m.id === id);
 }
 
-export function updateMessage(id: number, content: string) {
+export function updateMessage(id: number, title: string, content: string) {
   const message = getMessageById(id);
   if (message) {
+    message.title = title;
     message.content = content;
     message.updatedAt = new Date().toISOString();
     saveDb();

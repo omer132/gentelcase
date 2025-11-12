@@ -242,14 +242,14 @@ export default function Home() {
         {/* Header */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <div className="flex flex-wrap justify-between items-center gap-4">
-            <div>
+              <div>
               <p className="text-sm text-gray-800">Kullanıcı</p>
               <p className="font-semibold text-lg text-gray-900">{user.username}</p>
-              {user.isAdmin && (
+                  {user.isAdmin && (
                 <span className="inline-block mt-1 px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
-                  Admin
-                </span>
-              )}
+                      Admin
+                    </span>
+                  )}
             </div>
             <button
               onClick={handleLogout}
@@ -263,8 +263,8 @@ export default function Home() {
         {/* Message Input */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <form onSubmit={handleSubmitMessage} className="flex flex-col gap-3 text-gray-900">
-            <input
-              type="text"
+              <input
+                type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="Başlık"
@@ -272,23 +272,23 @@ export default function Home() {
               maxLength={120}
             />
             <textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Mesajınızı yazın..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Mesajınızı yazın..."
               className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              maxLength={1000}
+                maxLength={1000}
               rows={3}
-            />
+              />
             <div className="flex items-center justify-between text-xs text-gray-700">
               <span>{newTitle.length}/120 başlık karakteri</span>
               <span>{newMessage.length}/1000 mesaj karakteri</span>
             </div>
-            <button
-              type="submit"
+              <button
+                type="submit"
               className="self-end px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-            >
-              Gönder
-            </button>
+              >
+                Gönder
+              </button>
           </form>
         </div>
 
@@ -315,25 +315,25 @@ export default function Home() {
                     <div>
                       <p className="text-lg font-semibold text-gray-900 truncate">{message.title}</p>
                       <p className="font-semibold text-gray-800">
-                        {message.username}
+                          {message.username}
                         {message.isAdmin && (
                           <span className="ml-2 text-xs text-red-600">(Admin)</span>
                         )}
                       </p>
                       <p className="text-sm text-gray-700">{formatTime(message.createdAt)}</p>
-                    </div>
-                    {(message.userId === user.id || user.isAdmin) && (
+                  </div>
+                  {(message.userId === user.id || user.isAdmin) && (
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleDelete(message.id)}
                           className="text-red-600 hover:text-red-800 text-sm"
-                        >
+                      >
                           Sil
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
                   <p
                     className={`text-gray-800 ${
                       isExpanded ? 'whitespace-pre-wrap' : 'truncate'
@@ -343,20 +343,20 @@ export default function Home() {
                   </p>
 
                   {isTruncated && (
-                    <button
+                      <button
                       onClick={() =>
                         setExpandedMessageId((current) => (current === message.id ? null : message.id))
                       }
                       className="mt-2 text-sm text-blue-600 hover:text-blue-800"
-                    >
+                      >
                       {isExpanded ? 'Kapat' : 'Detayları Göster'}
-                    </button>
-                  )}
-
-                  {message.updatedAt && (
+                      </button>
+                )}
+                
+                {message.updatedAt && (
                     <p className="text-xs text-gray-400 mt-2">Düzenlendi</p>
-                  )}
-                </div>
+                )}
+              </div>
               );
             })
           )}
