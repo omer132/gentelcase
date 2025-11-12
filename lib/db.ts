@@ -1,9 +1,11 @@
 import path from 'path';
 import fs from 'fs';
+import { hashPassword } from './password';
 
-interface User {
+export interface User {
   id: number;
   username: string;
+  passwordHash: string;
   isAdmin: boolean;
   createdAt: string;
 }
@@ -39,7 +41,15 @@ function initDb(): Database {
 
   if (!fs.existsSync(dbPath)) {
     const db: Database = {
-      users: [{ id: 1, username: 'admin', isAdmin: true, createdAt: new Date().toISOString() }],
+      users: [
+        {
+          id: 1,
+          username: 'admin',
+          passwordHash: hashPassword('admin123'),
+          isAdmin: true,
+          createdAt: new Date().toISOString(),
+        },
+      ],
       sessions: [],
       messages: [],
     };
@@ -47,7 +57,41 @@ function initDb(): Database {
     return db;
   }
 
-  return JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+  const existingDb = JSON.parse(fs.readFileSync(dbPath, 'utf8')) as Database;
+  let shouldPersist = false;
+
+  for (const user of existingDb.users) {
+    if (typeof user.passwordHash !== 'string') {
+      user.passwordHash = '';
+      shouldPersist = true;
+    }
+  }
+
+  let adminUser = existingDb.users.find((u) => u.username === 'admin');
+
+  if (!adminUser) {
+    const nextId = existingDb.users.length
+      ? Math.max(...existingDb.users.map((u) => u.id)) + 1
+      : 1;
+    adminUser = {
+      id: nextId,
+      username: 'admin',
+      passwordHash: hashPassword('admin123'),
+      isAdmin: true,
+      createdAt: new Date().toISOString(),
+    };
+    existingDb.users.push(adminUser);
+    shouldPersist = true;
+  } else if (!adminUser.passwordHash) {
+    adminUser.passwordHash = hashPassword('admin123');
+    shouldPersist = true;
+  }
+
+  if (shouldPersist) {
+    fs.writeFileSync(dbPath, JSON.stringify(existingDb, null, 2));
+  }
+
+  return existingDb;
 }
 
 let db = initDb();
@@ -74,14 +118,27 @@ export function getUserById(id: number): User | undefined {
   return db.users.find((u) => u.id === id);
 }
 
-export function createUser(username: string, isAdmin: boolean): User {
+export function createUser(username: string, passwordHash: string, isAdmin: boolean): User {
   const user: User = {
     id: getNextUserId(),
     username,
+    passwordHash,
     isAdmin,
     createdAt: new Date().toISOString(),
   };
   db.users.push(user);
+  saveDb();
+  return user;
+}
+
+export function getUsers(): User[] {
+  return db.users.slice();
+}
+
+export function updateUserPassword(id: number, passwordHash: string): User | undefined {
+  const user = getUserById(id);
+  if (!user) return undefined;
+  user.passwordHash = passwordHash;
   saveDb();
   return user;
 }

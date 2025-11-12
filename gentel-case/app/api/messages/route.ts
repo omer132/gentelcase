@@ -9,6 +9,7 @@ export async function GET() {
         `
         SELECT 
           m.id, 
+          m.title,
           m.content, 
           m.createdAt, 
           m.updatedAt,
@@ -38,13 +39,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { content } = await request.json();
+    const { title, content } = await request.json();
 
-    if (!content || content.trim().length === 0) {
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+      return NextResponse.json({ error: 'Title is required' }, { status: 400 });
+    }
+
+    if (title.trim().length > 120) {
+      return NextResponse.json({ error: 'Title too long (max 120 characters)' }, { status: 400 });
+    }
+
+    if (!content || typeof content !== 'string' || content.trim().length === 0) {
       return NextResponse.json({ error: 'Content is required' }, { status: 400 });
     }
 
-    if (content.length > 1000) {
+    if (content.trim().length > 1000) {
       return NextResponse.json({ error: 'Message too long (max 1000 characters)' }, { status: 400 });
     }
 
@@ -59,13 +68,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
-    const result = db.prepare('INSERT INTO messages (content, userId) VALUES (?, ?)').run(content.trim(), user.id);
+    const result = db
+      .prepare('INSERT INTO messages (title, content, userId) VALUES (?, ?, ?)')
+      .run(title.trim(), content.trim(), user.id);
 
     const newMessage = db
       .prepare(
         `
         SELECT 
           m.id, 
+          m.title,
           m.content, 
           m.createdAt, 
           m.updatedAt,
@@ -85,5 +97,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to post message' }, { status: 500 });
   }
 }
+
+
+
+
+
 
 

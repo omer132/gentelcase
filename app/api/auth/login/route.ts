@@ -1,24 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createSession } from '@/lib/auth';
+import { authenticateUser, startSession } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { username } = await request.json();
+    const { username, password } = await request.json();
 
     if (!username || username.trim().length === 0) {
-      return NextResponse.json({ error: 'Username is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Kullanıcı adı gerekli' }, { status: 400 });
+    }
+
+    if (!password || password.length === 0) {
+      return NextResponse.json({ error: 'Şifre gerekli' }, { status: 400 });
     }
 
     const trimmedUsername = username.trim();
-    
-    // Check for existing user
-    const user = await createSession(trimmedUsername, trimmedUsername === 'admin');
+    const user = await authenticateUser(trimmedUsername, password);
 
-    return NextResponse.json({ success: true, user });
+    if (!user) {
+      return NextResponse.json({ error: 'Kullanıcı adı veya şifre hatalı' }, { status: 401 });
+    }
+
+    const sessionUser = await startSession(user.id);
+
+    return NextResponse.json({ success: true, user: sessionUser });
   } catch (error) {
     console.error('Login error:', error);
-    return NextResponse.json({ error: 'Login failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Giriş başarısız' }, { status: 500 });
   }
 }
-
-
